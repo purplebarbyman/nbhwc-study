@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useReducer, useEffect, useState } from 'react'
-import LoadingFallback from '@/components/LoadingFallback'
 
 interface StudyState {
   user: {
@@ -71,8 +70,6 @@ type StudyAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'CLEAR_ERROR' }
-  | { type: 'UPDATE_USER_NAME'; payload: string }
-  | { type: 'RESET_PROGRESS' }
 
 function studyReducer(state: StudyState, action: StudyAction): StudyState {
   try {
@@ -82,21 +79,12 @@ function studyReducer(state: StudyState, action: StudyAction): StudyState {
         const newPoints = state.user.points + (correct ? 10 : 0)
         const newLevel = Math.floor(newPoints / 1000) + 1
         
-        const newBadges = [...state.user.badges]
-        if (newLevel > state.user.level) {
-          newBadges.push(`Level ${newLevel} Achieved`)
-        }
-        if (newPoints > 0 && newPoints % 500 === 0) {
-          newBadges.push(`${newPoints} Points Milestone`)
-        }
-        
         return {
           ...state,
           user: {
             ...state.user,
             points: newPoints,
-            level: newLevel,
-            badges: newBadges
+            level: newLevel
           },
           progress: {
             ...state.progress,
@@ -108,118 +96,20 @@ function studyReducer(state: StudyState, action: StudyAction): StudyState {
                 : (state.progress[domain].accuracy * (state.progress[domain].completed - 1)) / state.progress[domain].completed
             }
           },
-          currentSession: {
-            ...state.currentSession,
-            questionsAnswered: state.currentSession.questionsAnswered + 1,
-            correctAnswers: state.currentSession.correctAnswers + (correct ? 1 : 0)
-          },
-          error: null
-        }
-      
-      case 'START_SESSION':
-        return {
-          ...state,
-          currentSession: {
-            domain: action.payload.domain,
-            questionsAnswered: 0,
-            correctAnswers: 0,
-            startTime: new Date()
-          },
-          error: null
-        }
-      
-      case 'END_SESSION':
-        const sessionAccuracy = state.currentSession.questionsAnswered > 0 
-          ? (state.currentSession.correctAnswers / state.currentSession.questionsAnswered) * 100 
-          : 0
-        
-        const newStreak = sessionAccuracy >= 70 ? state.user.streak + 1 : state.user.streak
-        const streakBadges = [...state.user.badges]
-        
-        if (newStreak > state.user.streak && newStreak % 7 === 0) {
-          streakBadges.push(`${newStreak} Day Streak`)
-        }
-        
-        return {
-          ...state,
-          user: {
-            ...state.user,
-            streak: newStreak,
-            badges: streakBadges
-          },
-          currentSession: {
-            domain: '',
-            questionsAnswered: 0,
-            correctAnswers: 0,
-            startTime: null
-          },
-          error: null
-        }
-      
-      case 'UPDATE_SETTINGS':
-        return {
-          ...state,
-          settings: { ...state.settings, ...action.payload },
-          error: null
-        }
-      
-      case 'AWARD_BADGE':
-        if (!state.user.badges.includes(action.payload)) {
-          return {
-            ...state,
-            user: {
-              ...state.user,
-              badges: [...state.user.badges, action.payload]
-            },
-            error: null
-          }
-        }
-        return state
-      
-      case 'LOAD_PROGRESS':
-        return {
-          ...action.payload,
-          isLoading: false,
           error: null
         }
       
       case 'SET_LOADING':
-        return {
-          ...state,
-          isLoading: action.payload
-        }
+        return { ...state, isLoading: action.payload }
       
       case 'SET_ERROR':
-        return {
-          ...state,
-          error: action.payload,
-          isLoading: false
-        }
+        return { ...state, error: action.payload, isLoading: false }
       
       case 'CLEAR_ERROR':
-        return {
-          ...state,
-          error: null
-        }
+        return { ...state, error: null }
       
-      case 'UPDATE_USER_NAME':
-        return {
-          ...state,
-          user: {
-            ...state.user,
-            name: action.payload
-          },
-          error: null
-        }
-      
-      case 'RESET_PROGRESS':
-        return {
-          ...initialState,
-          user: {
-            ...state.user,
-            name: state.user.name
-          }
-        }
+      case 'LOAD_PROGRESS':
+        return { ...action.payload, isLoading: false, error: null }
       
       default:
         return state
@@ -228,7 +118,7 @@ function studyReducer(state: StudyState, action: StudyAction): StudyState {
     console.error('StudyContext reducer error:', error)
     return {
       ...state,
-      error: 'An error occurred while updating your progress. Please try again.',
+      error: 'An error occurred while updating your progress.',
       isLoading: false
     }
   }
@@ -248,25 +138,19 @@ export function StudyProvider({ children }: { children: React.ReactNode }) {
       try {
         dispatch({ type: 'SET_LOADING', payload: true })
         
-        // Add delay to ensure DOM is ready
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
-        // Check if localStorage is available
+        // Ensure we're in browser environment
         if (typeof window !== 'undefined' && window.localStorage) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
           const saved = localStorage.getItem('nbhwc-progress')
           if (saved) {
-            const parsedData = JSON.parse(saved)
-            
-            // Validate data structure
-            if (parsedData && 
-                typeof parsedData === 'object' && 
-                parsedData.user && 
-                parsedData.progress &&
-                typeof parsedData.user === 'object' &&
-                typeof parsedData.progress === 'object') {
-              dispatch({ type: 'LOAD_PROGRESS', payload: parsedData })
-            } else {
-              console.warn('Invalid saved data structure, using initial state')
+            try {
+              const parsedData = JSON.parse(saved)
+              if (parsedData && typeof parsedData === 'object' && parsedData.user) {
+                dispatch({ type: 'LOAD_PROGRESS', payload: parsedData })
+              }
+            } catch (parseError) {
+              console.warn('Failed to parse saved data:', parseError)
             }
           }
         }
@@ -276,45 +160,34 @@ export function StudyProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error('StudyContext initialization error:', error)
         setIsInitialized(true)
-        dispatch({ type: 'SET_LOADING', payload: false })
-        dispatch({ 
-          type: 'SET_ERROR', 
-          payload: 'Failed to load study data. Starting with fresh session.' 
-        })
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to load study data' })
       }
     }
 
     initializeContext()
   }, [])
 
-  // Save progress to localStorage when state changes
+  // Save progress safely
   useEffect(() => {
-    try {
-      if (isInitialized && !state.isLoading && typeof window !== 'undefined' && window.localStorage) {
+    if (isInitialized && !state.isLoading && typeof window !== 'undefined') {
+      try {
         localStorage.setItem('nbhwc-progress', JSON.stringify(state))
+      } catch (error) {
+        console.error('Failed to save progress:', error)
       }
-    } catch (error) {
-      console.error('Failed to save progress:', error)
-      dispatch({ 
-        type: 'SET_ERROR', 
-        payload: 'Failed to save progress. Your session data may not persist.' 
-      })
     }
   }, [state, isInitialized])
 
-  // Auto-clear errors after 5 seconds
-  useEffect(() => {
-    if (state.error) {
-      const timer = setTimeout(() => {
-        dispatch({ type: 'CLEAR_ERROR' })
-      }, 5000)
-      
-      return () => clearTimeout(timer)
-    }
-  }, [state.error])
-
   if (!isInitialized) {
-    return <LoadingFallback />
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">NBHWC Study Platform</h1>
+          <p className="text-gray-600">Initializing your study environment...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

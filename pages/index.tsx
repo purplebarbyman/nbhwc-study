@@ -1,40 +1,13 @@
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import { BookOpen, Target, Trophy, Users } from 'lucide-react'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
-
-// Production-safe dynamic imports with loading fallbacks
-const MotionDiv = dynamic(
-  () => import('framer-motion').then(mod => mod.motion.div),
-  { 
-    ssr: false,
-    loading: () => <div className="animate-pulse bg-gray-200 rounded-lg h-20 w-full"></div>
-  }
-)
-
-const MotionButton = dynamic(
-  () => import('framer-motion').then(mod => mod.motion.button),
-  { 
-    ssr: false,
-    loading: () => <div className="animate-pulse bg-primary-200 rounded-lg h-12 w-32"></div>
-  }
-)
-
-// Fallback component for motion elements
-const StaticFallback = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={className}>{children}</div>
-)
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
-  const [motionReady, setMotionReady] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    // Give motion components time to load
-    const timer = setTimeout(() => setMotionReady(true), 200)
-    return () => clearTimeout(timer)
   }, [])
 
   if (!mounted) {
@@ -44,11 +17,10 @@ export default function Home() {
           <div className="container mx-auto px-4 py-16">
             <div className="text-center mb-16">
               <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                Master Your <span className="text-primary-600">NBHWC Certification</span>
+                Master Your <span className="text-blue-600">NBHWC Certification</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                Comprehensive, gamified study platform designed to help you achieve near-100% pass rates 
-                through adaptive learning and interactive content.
+                Loading your comprehensive study platform...
               </p>
             </div>
           </div>
@@ -60,112 +32,69 @@ export default function Home() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        {/* Hero Section with Safe Motion */}
-        <Suspense fallback={<StaticFallback className="container mx-auto px-4 py-16">{null}</StaticFallback>}>
-          {motionReady ? (
-            <MotionDiv 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="container mx-auto px-4 py-16"
-            >
-              <div className="text-center mb-16">
-                <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                  Master Your <span className="text-primary-600">NBHWC Certification</span>
-                </h1>
-                <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                  Comprehensive, gamified study platform designed to help you achieve near-100% pass rates 
-                  through adaptive learning and interactive content.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link href="/dashboard">
-                    <Suspense fallback={<div className="bg-primary-600 text-white px-8 py-4 rounded-lg font-semibold text-lg">Start Studying Now</div>}>
-                      <MotionButton 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="bg-primary-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors"
-                      >
-                        Start Studying Now
-                      </MotionButton>
-                    </Suspense>
-                  </Link>
-                  <Link href="/assessment">
-                    <Suspense fallback={<div className="border-2 border-primary-600 text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg">Take Diagnostic Test</div>}>
-                      <MotionButton 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="border-2 border-primary-600 text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors"
-                      >
-                        Take Diagnostic Test
-                      </MotionButton>
-                    </Suspense>
-                  </Link>
-                </div>
-              </div>
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl font-bold text-gray-900 mb-6">
+              Master Your <span className="text-blue-600">NBHWC Certification</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Comprehensive, gamified study platform designed to help you achieve near-100% pass rates 
+              through adaptive learning and interactive content.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/dashboard">
+                <button className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors">
+                  Start Studying Now
+                </button>
+              </Link>
+              <Link href="/assessment">
+                <button className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors">
+                  Take Diagnostic Test
+                </button>
+              </Link>
+            </div>
+          </div>
 
-              {/* Features Grid */}
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-                {[
-                  { icon: BookOpen, title: "2000+ Questions", desc: "Comprehensive question bank across all domains" },
-                  { icon: Target, title: "Adaptive Learning", desc: "AI-powered personalized study paths" },
-                  { icon: Trophy, title: "Gamified Experience", desc: "Earn points, badges, and track streaks" },
-                  { icon: Users, title: "Expert Reviewed", desc: "Content validated by certified NBHWC coaches" }
-                ].map((feature, index) => (
-                  <Suspense key={index} fallback={<div className="bg-white p-6 rounded-xl shadow-lg h-40 animate-pulse"></div>}>
-                    <MotionDiv
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8, delay: index * 0.1 }}
-                      className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
-                    >
-                      <feature.icon className="w-12 h-12 text-primary-600 mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                      <p className="text-gray-600">{feature.desc}</p>
-                    </MotionDiv>
-                  </Suspense>
-                ))}
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            {[
+              { icon: BookOpen, title: "2000+ Questions", desc: "Comprehensive question bank across all domains" },
+              { icon: Target, title: "Adaptive Learning", desc: "AI-powered personalized study paths" },
+              { icon: Trophy, title: "Gamified Experience", desc: "Earn points, badges, and track streaks" },
+              { icon: Users, title: "Expert Reviewed", desc: "Content validated by certified NBHWC coaches" }
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+              >
+                <feature.icon className="w-12 h-12 text-blue-600 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.desc}</p>
               </div>
+            ))}
+          </div>
 
-              {/* Study Domains */}
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <h2 className="text-3xl font-bold text-center mb-8">Study Domains</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {[
-                    { name: "Coaching Structure", weight: "15%", color: "bg-blue-500" },
-                    { name: "Coaching Process", weight: "48%", color: "bg-green-500" },
-                    { name: "Health & Wellness", weight: "23%", color: "bg-purple-500" },
-                    { name: "Ethics & Legal", weight: "14%", color: "bg-orange-500" }
-                  ].map((domain, index) => (
-                    <Link key={index} href={`/study/${domain.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                      <Suspense fallback={<div className="cursor-pointer p-6 rounded-lg bg-gray-50 h-24 animate-pulse"></div>}>
-                        <MotionDiv
-                          whileHover={{ scale: 1.05 }}
-                          className="cursor-pointer p-6 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                        >
-                          <div className={`w-full h-2 ${domain.color} rounded-full mb-4`}></div>
-                          <h3 className="font-semibold text-lg mb-2">{domain.name}</h3>
-                          <p className="text-gray-600">{domain.weight} of exam</p>
-                        </MotionDiv>
-                      </Suspense>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </MotionDiv>
-          ) : (
-            <StaticFallback className="container mx-auto px-4 py-16">
-              <div className="text-center mb-16">
-                <h1 className="text-5xl font-bold text-gray-900 mb-6">
-                  Master Your <span className="text-primary-600">NBHWC Certification</span>
-                </h1>
-                <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                  Comprehensive, gamified study platform designed to help you achieve near-100% pass rates 
-                  through adaptive learning and interactive content.
-                </p>
-              </div>
-            </StaticFallback>
-          )}
-        </Suspense>
+          {/* Study Domains */}
+          <div className="bg-white rounded-2xl p-8 shadow-lg">
+            <h2 className="text-3xl font-bold text-center mb-8">Study Domains</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { name: "Coaching Structure", weight: "15%", color: "bg-blue-500" },
+                { name: "Coaching Process", weight: "48%", color: "bg-green-500" },
+                { name: "Health & Wellness", weight: "23%", color: "bg-purple-500" },
+                { name: "Ethics & Legal", weight: "14%", color: "bg-orange-500" }
+              ].map((domain, index) => (
+                <Link key={index} href={`/study/${domain.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <div className="cursor-pointer p-6 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className={`w-full h-2 ${domain.color} rounded-full mb-4`}></div>
+                    <h3 className="font-semibold text-lg mb-2">{domain.name}</h3>
+                    <p className="text-gray-600">{domain.weight} of exam</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </Layout>
   )

@@ -9,9 +9,10 @@ const nextConfig = {
     unoptimized: true,
   },
   
-  // Asset and base path configuration
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/nbhwc-study' : '',
-  basePath: process.env.NODE_ENV === 'production' ? '/nbhwc-study' : '',
+  // Remove asset prefix and base path for Cloudflare Pages
+  // Cloudflare serves from root, not subdirectory
+  assetPrefix: '',
+  basePath: '',
   
   // Performance optimizations
   experimental: {
@@ -25,7 +26,7 @@ const nextConfig = {
     } : false,
   },
   
-  // React strict mode (moved to correct location)
+  // React strict mode
   reactStrictMode: true,
   
   // Power optimization
@@ -33,6 +34,12 @@ const nextConfig = {
   
   // Compression settings
   compress: true,
+  
+  // Ensure proper static generation
+  generateEtags: false,
+  
+  // Optimize for static hosting
+  distDir: '.next',
 }
 
 module.exports = nextConfig

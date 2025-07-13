@@ -3,13 +3,6 @@ import Layout from '@/components/Layout'
 import { useStudy } from '@/contexts/StudyContext'
 import { Trophy, Target, Clock, TrendingUp, BookOpen, Award } from 'lucide-react'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
-
-// Dynamic imports for motion components to prevent SSR issues
-const MotionDiv = dynamic(
-  () => import('framer-motion').then(mod => mod.motion.div),
-  { ssr: false }
-)
 
 export default function Dashboard() {
   const { state } = useStudy()
@@ -42,16 +35,12 @@ export default function Dashboard() {
     <Layout>
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Header */}
-        <MotionDiv 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome back, {state.user.name}! 
           </h1>
           <p className="text-gray-600">Ready to continue your NBHWC certification journey?</p>
-        </MotionDiv>
+        </div>
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -61,12 +50,9 @@ export default function Dashboard() {
             { icon: Clock, label: "Streak", value: `${state.user.streak} days`, color: "text-green-600" },
             { icon: TrendingUp, label: "Progress", value: `${Math.round(overallProgress)}%`, color: "text-purple-600" }
           ].map((stat, index) => (
-            <MotionDiv
+            <div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white p-6 rounded-xl shadow-lg"
+              className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -75,18 +61,14 @@ export default function Dashboard() {
                 </div>
                 <stat.icon className={`w-8 h-8 ${stat.color}`} />
               </div>
-            </MotionDiv>
+            </div>
           ))}
         </div>
 
         {/* Progress Chart Section */}
         <div className="grid lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2">
-            <MotionDiv 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="bg-white p-6 rounded-xl shadow-lg"
-            >
+            <div className="bg-white p-6 rounded-xl shadow-lg">
               <h2 className="text-xl font-semibold mb-4">Domain Progress</h2>
               <div className="space-y-4">
                 {Object.entries(state.progress).map(([domain, progress]) => {
@@ -106,7 +88,7 @@ export default function Dashboard() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
-                          className="bg-primary-600 h-3 rounded-full transition-all duration-500"
+                          className="bg-blue-600 h-3 rounded-full transition-all duration-500"
                           style={{ width: `${domainProgress}%` }}
                         ></div>
                       </div>
@@ -118,16 +100,12 @@ export default function Dashboard() {
                   )
                 })}
               </div>
-            </MotionDiv>
+            </div>
           </div>
           
           <div className="space-y-6">
             {/* Study Streak */}
-            <MotionDiv 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="bg-white p-6 rounded-xl shadow-lg"
-            >
+            <div className="bg-white p-6 rounded-xl shadow-lg">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-green-600" />
                 Study Streak
@@ -148,14 +126,10 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-            </MotionDiv>
+            </div>
             
             {/* Badges */}
-            <MotionDiv 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="bg-white p-6 rounded-xl shadow-lg"
-            >
+            <div className="bg-white p-6 rounded-xl shadow-lg">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Award className="w-5 h-5 mr-2 text-yellow-600" />
                 Recent Badges
@@ -174,16 +148,12 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-            </MotionDiv>
+            </div>
           </div>
         </div>
 
         {/* Study Domains */}
-        <MotionDiv 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-6"
-        >
+        <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-xl font-semibold mb-6">Continue Studying</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {Object.entries(state.progress).map(([domain, progress]) => {
@@ -197,10 +167,7 @@ export default function Dashboard() {
               
               return (
                 <Link key={domain} href={`/study/${domain}`}>
-                  <MotionDiv 
-                    whileHover={{ scale: 1.02 }}
-                    className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                  >
+                  <div className="border rounded-lg p-4 hover:shadow-md hover:scale-105 transition-all cursor-pointer">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold">{domainNames[domain as keyof typeof domainNames]}</h3>
                       <BookOpen className="w-5 h-5 text-gray-400" />
@@ -212,7 +179,7 @@ export default function Dashboard() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
-                          className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${domainProgress}%` }}
                         ></div>
                       </div>
@@ -220,19 +187,15 @@ export default function Dashboard() {
                     <p className="text-sm text-gray-600">
                       Accuracy: {Math.round(progress.accuracy)}%
                     </p>
-                  </MotionDiv>
+                  </div>
                 </Link>
               )
             })}
           </div>
-        </MotionDiv>
+        </div>
 
         {/* Quick Actions */}
-        <MotionDiv 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8 grid md:grid-cols-3 gap-4"
-        >
+        <div className="mt-8 grid md:grid-cols-3 gap-4">
           <Link href="/quiz">
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:shadow-lg transition-shadow cursor-pointer">
               <h3 className="font-semibold mb-2">Quick Quiz</h3>
@@ -251,7 +214,7 @@ export default function Dashboard() {
               <p className="text-purple-100 text-sm">Detailed performance insights</p>
             </div>
           </Link>
-        </MotionDiv>
+        </div>
       </div>
     </Layout>
   )
