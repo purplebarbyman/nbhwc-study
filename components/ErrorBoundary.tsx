@@ -2,6 +2,7 @@ import React from 'react'
 
 interface ErrorBoundaryState {
   hasError: boolean
+  error?: Error
 }
 
 class ErrorBoundary extends React.Component<
@@ -13,28 +14,33 @@ class ErrorBoundary extends React.Component<
     this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(): ErrorBoundaryState {
-    return { hasError: true }
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.log('Error caught by boundary:', error, errorInfo)
+    console.error('Error caught by boundary:', error, errorInfo)
   }
 
   render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Something went wrong
-            </h1>
-            <button
-              onClick={() => this.setState({ hasError: false })}
-              className="bg-primary-600 text-white px-4 py-2 rounded-lg"
-            >
-              Try again
-            </button>
+          <div className="max-w-md mx-auto text-center p-6">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+              <h1 className="text-xl font-bold text-red-900 mb-4">
+                Application Error
+              </h1>
+              <p className="text-red-700 mb-4">
+                Something went wrong while loading the application.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
           </div>
         </div>
       )
