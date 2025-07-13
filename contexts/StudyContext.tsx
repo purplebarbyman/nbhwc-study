@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react'
+import React, { createContext, useContext, useReducer, useEffect, useState } from 'react'
+import LoadingFallback from '@/components/LoadingFallback'
 
 interface StudyState {
   user: {
@@ -81,7 +82,6 @@ function studyReducer(state: StudyState, action: StudyAction): StudyState {
         const newPoints = state.user.points + (correct ? 10 : 0)
         const newLevel = Math.floor(newPoints / 1000) + 1
         
-        // Award badges for milestones
         const newBadges = [...state.user.badges]
         if (newLevel > state.user.level) {
           newBadges.push(`Level ${newLevel} Achieved`)
@@ -129,7 +129,6 @@ function studyReducer(state: StudyState, action: StudyAction): StudyState {
         }
       
       case 'END_SESSION':
-        // Update streak if session was productive
         const sessionAccuracy = state.currentSession.questionsAnswered > 0 
           ? (state.currentSession.correctAnswers / state.currentSession.questionsAnswered) * 100 
           : 0
@@ -218,7 +217,7 @@ function studyReducer(state: StudyState, action: StudyAction): StudyState {
           ...initialState,
           user: {
             ...state.user,
-            name: state.user.name // Keep the user's name
+            name: state.user.name
           }
         }
       
@@ -242,50 +241,66 @@ const StudyContext = createContext<{
 
 export function StudyProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(studyReducer, initialState)
+  const [isInitialized, setIsInitialized] = useState(false)
 
-  // Load progress from localStorage on mount
   useEffect(() => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true })
-      
-      const saved = localStorage.getItem('nbhwc-progress')
-      if (saved) {
-        const parsedData = JSON.parse(saved)
+    const initializeContext = async () => {
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true })
         
-        // Validate the loaded data structure
-        if (parsedData && typeof parsedData === 'object' && parsedData.user && parsedData.progress) {
-          dispatch({ type: 'LOAD_PROGRESS', payload: parsedData })
-        } else {
-          console.warn('Invalid saved data structure, using initial state')
-          dispatch({ type: 'SET_LOADING', payload: false })
+        // Add delay to ensure DOM is ready
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // Check if localStorage is available
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const saved = localStorage.getItem('nbhwc-progress')
+          if (saved) {
+            const parsedData = JSON.parse(saved)
+            
+            // Validate data structure
+            if (parsedData && 
+                typeof parsedData === 'object' && 
+                parsedData.user && 
+                parsedData.progress &&
+                typeof parsedData.user === 'object' &&
+                typeof parsedData.progress === 'object') {
+              dispatch({ type: 'LOAD_PROGRESS', payload: parsedData })
+            } else {
+              console.warn('Invalid saved data structure, using initial state')
+            }
+          }
         }
-      } else {
+        
+        setIsInitialized(true)
         dispatch({ type: 'SET_LOADING', payload: false })
+      } catch (error) {
+        console.error('StudyContext initialization error:', error)
+        setIsInitialized(true)
+        dispatch({ type: 'SET_LOADING', payload: false })
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: 'Failed to load study data. Starting with fresh session.' 
+        })
       }
-    } catch (error) {
-      console.error('Failed to load saved progress:', error)
-      dispatch({ 
-        type: 'SET_ERROR', 
-        payload: 'Failed to load your saved progress. Starting with a fresh session.' 
-      })
     }
+
+    initializeContext()
   }, [])
 
   // Save progress to localStorage when state changes
   useEffect(() => {
     try {
-      // Don't save during initial loading
-      if (!state.isLoading) {
+      if (isInitialized && !state.isLoading && typeof window !== 'undefined' && window.localStorage) {
         localStorage.setItem('nbhwc-progress', JSON.stringify(state))
       }
     } catch (error) {
       console.error('Failed to save progress:', error)
       dispatch({ 
         type: 'SET_ERROR', 
-        payload: 'Failed to save your progress. Your session data may not persist.' 
+        payload: 'Failed to save progress. Your session data may not persist.' 
       })
     }
-  }, [state])
+  }, [state, isInitialized])
 
   // Auto-clear errors after 5 seconds
   useEffect(() => {
@@ -297,6 +312,10 @@ export function StudyProvider({ children }: { children: React.ReactNode }) {
       return () => clearTimeout(timer)
     }
   }, [state.error])
+
+  if (!isInitialized) {
+    return <LoadingFallback />
+  }
 
   return (
     <StudyContext.Provider value={{ state, dispatch }}>
@@ -311,40 +330,4 @@ export function useStudy() {
     throw new Error('useStudy must be used within StudyProvider')
   }
   return context
-}
-
-// Helper functions for common operations
-export const studyHelpers = {
-  calculateOverallProgress: (progress: StudyState['progress']) => {
-    const totalQuestions = Object.values(progress).reduce((sum, domain) => sum + domain.total, 0)
-    const completedQuestions = Object.values(progress).reduce((sum, domain) => sum + domain.completed, 0)
-    return totalQuestions > 0 ? (completedQuestions / totalQuestions) * 100 : 0
-  },
-  
-  calculateOverallAccuracy: (progress: StudyState['progress']) => {
-    const domains = Object.values(progress).filter(domain => domain.completed > 0)
-    if (domains.length === 0) return 0
-    
-    const totalAccuracy = domains.reduce((sum, domain) => sum + domain.accuracy, 0)
-    return totalAccuracy / domains.length
-  },
-  
-  getWeakestDomain: (progress: StudyState['progress']) => {
-    const domains = Object.entries(progress).filter(([_, domain]) => domain.completed > 0)
-    if (domains.length === 0) return null
-    
-    return domains.reduce((weakest, [key, domain]) => 
-      domain.accuracy < weakest[1].accuracy ? [key, domain] : weakest
-    )[0]
-  },
-  
-  getRecommendedStudyTime: (settings: StudyState['settings'], progress: StudyState['progress']) => {
-    const overallProgress = studyHelpers.calculateOverallProgress(progress)
-    const remainingProgress = 100 - overallProgress
-    const weeksRemaining = settings.targetDate ? 
-      Math.max(1, Math.ceil((new Date(settings.targetDate).getTime() - Date.now()) / (7 * 24 * 60 * 60 * 1000))) : 
-      12 // Default to 12 weeks
-    
-    return Math.ceil((remainingProgress / 100) * settings.studyHoursPerWeek * weeksRemaining)
-  }
 }
