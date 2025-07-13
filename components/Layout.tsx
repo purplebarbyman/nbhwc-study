@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import Head from 'next/head'
-import Navigation from './Navigation'
+import Navigation from '@/components/Navigation'
 
 interface LayoutProps {
   children: ReactNode
