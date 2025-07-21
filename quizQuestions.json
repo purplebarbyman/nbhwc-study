@@ -1,0 +1,110 @@
+[
+  {
+    "topic": "Motivational Interviewing",
+    "question": "(Set D) Q121: A client says, 'I want to exercise more, but I always give up.' Which coaching technique BEST helps explore this ambivalence?",
+    "option1": "Simple reflection",
+    "option2": "Premature planning",
+    "option3": "Reinforcing ambivalence",
+    "option4": "Double-sided reflection",
+    "correct_answer_index": 3,
+    "difficulty": 3,
+    "explanation": "Double-sided reflections help clients explore both sides of their feelings to make better decisions.",
+    "eli5": "Double-sided reflections help clients explore both sides of their feelings to make better decisions."
+  },
+  {
+    "topic": "Coaching Structure",
+    "question": "(Set C) Q1044: What is the typical sequence for a 30-minute health coaching session?",
+    "option1": "No client input",
+    "option2": "Lack of agenda agreement",
+    "option3": "Focusing only on content",
+    "option4": "Review goals, set agenda, explore topics, close session",
+    "correct_answer_index": 3,
+    "difficulty": 3,
+    "explanation": "Coaching sessions follow a flow: review, set agenda, explore, and wrap up to help clients stay on track.",
+    "eli5": "Coaching sessions follow a flow: review, set agenda, explore, and wrap up to help clients stay on track."
+  },
+  {
+    "topic": "Coaching Structure",
+    "question": "(Set B) Q1524: What is the typical sequence for a 30-minute health coaching session?",
+    "option1": "Lack of agenda agreement",
+    "option2": "Focusing only on content",
+    "option3": "No client input",
+    "option4": "Review goals, set agenda, explore topics, close session",
+    "correct_answer_index": 3,
+    "difficulty": 3,
+    "explanation": "Coaching sessions follow a flow: review, set agenda, explore, and wrap up to help clients stay on track.",
+    "eli5": "Coaching sessions follow a flow: review, set agenda, explore, and wrap up to help clients stay on track."
+  },
+  {
+    "topic": "Motivational Interviewing",
+    "question": "(Set A) Q1606: A client says, 'I want to exercise more, but I always give up.' Which coaching technique BEST helps explore this ambivalence?",
+    "option1": "Double-sided reflection",
+    "option2": "Reinforcing ambivalence",
+    "option3": "Premature planning",
+    "option4": "Simple reflection",
+    "correct_answer_index": 0,
+    "difficulty": 3,
+    "explanation": "Double-sided reflections help clients explore both sides of their feelings to make better decisions.",
+    "eli5": "Double-sided reflections help clients explore both sides of their feelings to make better decisions."
+  },
+  {
+    "topic": "HIPAA Basics",
+    "question": "(Set D) Q2118: True or False: It\u2019s within a health coach\u2019s scope of practice to diagnose a client\u2019s medical condition.",
+    "option1": "Sharing info without consent",
+    "option2": "Emailing PHI unencrypted",
+    "option3": "Correct answer",
+    "option4": "Talking in public spaces",
+    "correct_answer_index": 2,
+    "difficulty": 1,
+    "explanation": "Health coaches do not diagnose; they support behavior change and refer to doctors when needed.",
+    "eli5": "Health coaches do not diagnose; they support behavior change and refer to doctors when needed."
+  },
+  {
+    "topic": "Coaching Structure",
+    "question": "(Set G) Q1164: What is the typical sequence for a 30-minute health coaching session?",
+    "option1": "Focusing only on content",
+    "option2": "No client input",
+    "option3": "Lack of agenda agreement",
+    "option4": "Review goals, set agenda, explore topics, close session",
+    "correct_answer_index": 3,
+    "difficulty": 3,
+    "explanation": "Coaching sessions follow a flow: review, set agenda, explore, and wrap up to help clients stay on track.",
+    "eli5": "Coaching sessions follow a flow: review, set agenda, explore, and wrap up to help clients stay on track."
+  },
+  {
+    "topic": "SMART Goals",
+    "question": "(Set B) Q132: A 55-year-old client with hypertension wants to start an exercise program. Which initial strategy is MOST appropriate?",
+    "option1": "Setting outcome-only goals",
+    "option2": "Skipping action planning",
+    "option3": "Suggest moderate aerobic activity after medical clearance",
+    "option4": "Ignoring barriers",
+    "correct_answer_index": 2,
+    "difficulty": 5,
+    "explanation": "Moderate exercise with medical clearance is safe and effective for managing hypertension.",
+    "eli5": "Moderate exercise with medical clearance is safe and effective for managing hypertension."
+  },
+  {
+    "topic": "HIPAA Basics",
+    "question": "(Set E) Q583: True or False: It\u2019s within a health coach\u2019s scope of practice to diagnose a client\u2019s medical condition.",
+    "option1": "Correct answer",
+    "option2": "Emailing PHI unencrypted",
+    "option3": "Talking in public spaces",
+    "option4": "Sharing info without consent",
+    "correct_answer_index": 0,
+    "difficulty": 1,
+    "explanation": "Health coaches do not diagnose; they support behavior change and refer to doctors when needed.",
+    "eli5": "Health coaches do not diagnose; they support behavior change and refer to doctors when needed."
+  },
+  {
+    "topic": "SMART Goals",
+    "question": "(Set G) Q1557: A 55-year-old client with hypertension wants to start an exercise program. Which initial strategy is MOST appropriate?",
+    "option1": "Skipping action planning",
+    "option2": "Suggest moderate aerobic activity after medical clearance",
+    "option3": "Setting outcome-only goals",
+    "option4": "Ignoring barriers",
+    "correct_answer_index": 1,
+    "difficulty": 5,
+    "explanation": "Moderate exercise with medical clearance is safe and effective for managing hypertension.",
+    "eli5": "Moderate exercise with medical clearance is safe and effective for managing hypertension."
+  }
+]
